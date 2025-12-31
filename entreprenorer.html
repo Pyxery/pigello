@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entreprenörer | Pigello</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+    .app { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+    .sidebar-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: #5a6a72;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 13px;
+    }
+    .logo-text { font-size: 17px; font-weight: 600; color: #374151; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title {
+      font-size: 11px; font-weight: 600; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0 12px; margin-bottom: 8px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: 3px;
+      color: #64748b; text-decoration: none;
+      font-size: 13px; font-weight: 500;
+      transition: all 0.1s; cursor: pointer;
+      border-left: 2px solid transparent;
+    }
+    .nav-item:hover { background: #f1f5f9; color: #1e293b; }
+    .nav-item.active { background: #e5e7eb; color: #374151; border-left-color: #6b7280; }
+    .nav-item .icon { width: 20px; height: 20px; stroke-width: 1.75; }
+    .nav-badge {
+      margin-left: auto;
+      background: #fee2e2; color: #dc2626;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 10px;
+    }
+    .nav-badge.gray { background: #f1f5f9; color: #64748b; }
+    .sidebar-footer { padding: 16px; border-top: 1px solid #e2e8f0; }
+    .user-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px; border-radius: 8px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .user-card:hover { background: #f1f5f9; }
+    .user-avatar {
+      width: 34px; height: 34px;
+      background: #6b7280;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 600; font-size: 12px;
+    }
+    .user-info { flex: 1; }
+    .user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .user-role { font-size: 12px; color: #94a3b8; }
+
+    /* Main */
+    .main { flex: 1; margin-left: 260px; min-height: 100vh; }
+    .topbar {
+      height: 64px; background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; position: sticky; top: 0; z-index: 50;
+    }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .breadcrumb a { color: #64748b; text-decoration: none; }
+    .breadcrumb a:hover { color: #374151; }
+    .breadcrumb-sep { color: #cbd5e1; }
+    .breadcrumb-current { color: #1e293b; font-weight: 500; }
+
+    /* Page */
+    .page { padding: 32px; }
+    .page-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .page-title { font-size: 24px; font-weight: 700; color: #1e293b; }
+    .page-subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 3px;
+      font-size: 13px; font-weight: 500;
+      border: 1px solid; cursor: pointer; transition: all 0.1s;
+    }
+    .btn .icon { width: 16px; height: 16px; }
+    .btn-primary { background: #475569; color: white; border-color: #475569; }
+    .btn-primary:hover { background: #334155; border-color: #334155; }
+    .btn-secondary { background: #ffffff; color: #374151; border-color: #e2e8f0; }
+    .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+    /* Cards */
+    .card {
+      background: #ffffff; border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+    .card-header {
+      padding: 16px 20px; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between;
+      background: #f9fafb;
+    }
+    .card-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 600; color: #1e293b;
+    }
+    .card-title .icon { width: 18px; height: 18px; color: #6B7280; }
+
+    /* Table */
+    .table-container { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead {
+      background: #f9fafb;
+    }
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    td {
+      padding: 14px 16px;
+      font-size: 14px;
+      color: #1e293b;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    tr:hover td {
+      background: #f8fafc;
+    }
+    .contractor-name {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .contractor-email a,
+    .contractor-phone a {
+      color: #4A7C94;
+      text-decoration: none;
+    }
+    .contractor-email a:hover,
+    .contractor-phone a:hover {
+      text-decoration: underline;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-vvs { background: #dbeafe; color: #1e40af; }
+    .badge-el { background: #fef3c7; color: #92400e; }
+    .badge-bygg { background: #dcfce7; color: #166534; }
+    .badge-las { background: #f3e8ff; color: #6b21a8; }
+    .badge-ventilation { background: #e0e7ff; color: #3730a3; }
+    .badge-sanitet { background: #cffafe; color: #0e7490; }
+    .badge-maleri { background: #ffe4e6; color: #be123c; }
+    .badge-golv { background: #fef9c3; color: #854d0e; }
+
+    .status-active {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #16a34a;
+      font-size: 13px;
+    }
+    .status-active .dot {
+      width: 8px;
+      height: 8px;
+      background: #16a34a;
+      border-radius: 50%;
+    }
+
+    /* Search */
+    .search-box {
+      position: relative;
+      width: 280px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #1e293b;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: #6b7280;
+    }
+    .search-box .icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: #94a3b8;
+    }
+
+    /* Filter tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .filter-tab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-tab:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+    .filter-tab.active {
+      background: #475569;
+      color: white;
+      border-color: #475569;
+    }
+
+    /* Contractor cards for mobile/alternative view */
+    .contractor-cards {
+      display: none;
+    }
+
+    /* Toast */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+    .toast {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; background: #1e293b; color: white;
+      border-radius: 10px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast .icon { width: 20px; height: 20px; color: #22c55e; }
+
+    /* Info banner */
+    .info-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .info-banner .icon {
+      width: 20px;
+      height: 20px;
+      color: #3b82f6;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .info-banner-content {
+      flex: 1;
+    }
+    .info-banner-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 4px;
+    }
+    .info-banner-text {
+      font-size: 13px;
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">P</div>
+        <span class="logo-text">Pigello</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Oversikt</div>
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard" class="icon"></i>
+          Dashboard
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Forvaltning</div>
+        <a href="#" class="nav-item">
+          <i data-lucide="building-2" class="icon"></i>
+          Fastigheter
+          <span class="nav-badge gray">24</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="users" class="icon"></i>
+          Hyresgaster
+          <span class="nav-badge gray">847</span>
+        </a>
+        <a href="arenden.html" class="nav-item">
+          <i data-lucide="clipboard-list" class="icon"></i>
+          Arenden
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="entreprenorer.html" class="nav-item active">
+          <i data-lucide="hard-hat" class="icon"></i>
+          Entreprenorer
+          <span class="nav-badge gray">15</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="file-text" class="icon"></i>
+          Avtal
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Ekonomi</div>
+        <a href="#" class="nav-item">
+          <i data-lucide="credit-card" class="icon"></i>
+          Hyresavier
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="bar-chart-3" class="icon"></i>
+          Rapporter
+        </a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">ML</div>
+        <div class="user-info">
+          <div class="user-name">Maria Lindqvist</div>
+          <div class="user-role">Forvaltare</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <nav class="breadcrumb">
+        <a href="index.html">Dashboard</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Entreprenorer</span>
+      </nav>
+    </header>
+
+    <div class="page">
+      <!-- Info banner for Rafter -->
+      <div class="info-banner">
+        <i data-lucide="info" class="icon"></i>
+        <div class="info-banner-content">
+          <div class="info-banner-title">Rafter-integration</div>
+          <div class="info-banner-text">Oppna Rafter och klicka pa skanna-knappen i arbetsorder-sektionen for att importera entreprenorer automatiskt.</div>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Entreprenorer</h1>
+          <p class="page-subtitle">Hantera dina avtalade entreprenorer och leverantorer</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <div class="search-box">
+            <i data-lucide="search" class="icon"></i>
+            <input type="text" placeholder="Sok entreprenor..." id="search-input">
+          </div>
+          <button class="btn btn-primary">
+            <i data-lucide="plus" class="icon"></i>
+            Lagg till entreprenor
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">Alla</button>
+        <button class="filter-tab" data-filter="vvs">VVS</button>
+        <button class="filter-tab" data-filter="el">El</button>
+        <button class="filter-tab" data-filter="bygg">Bygg</button>
+        <button class="filter-tab" data-filter="las">Las</button>
+        <button class="filter-tab" data-filter="ventilation">Ventilation</button>
+      </div>
+
+      <!-- Contractors Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i data-lucide="hard-hat" class="icon"></i>
+            Avtalade entreprenorer
+          </h2>
+          <span style="font-size: 13px; color: #64748b;">15 entreprenorer</span>
+        </div>
+        <div class="table-container">
+          <table id="contractors-table">
+            <thead>
+              <tr>
+                <th>Foretag</th>
+                <th>Kategori</th>
+                <th>Kontaktperson</th>
+                <th>E-post</th>
+                <th>Telefon</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- VVS -->
+              <tr class="contractor-row" data-category="vvs" data-contractor='{"name":"Rorjouren Stockholm AB","email":"jour@rorjouren.se","phone":"08-123 45 67","specialty":"VVS"}'>
+                <td class="contractor-name">Rorjouren Stockholm AB</td>
+                <td><span class="badge badge-vvs">VVS</span></td>
+                <td>Erik Johansson</td>
+                <td class="contractor-email"><a href="mailto:jour@rorjouren.se">jour@rorjouren.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4681234567">08-123 45 67</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+              <tr class="contractor-row" data-category="vvs" data-contractor='{"name":"VVS-Teknik & Service","email":"info@vvsteknik.se","phone":"08-234 56 78","specialty":"VVS"}'>
+                <td class="contractor-name">VVS-Teknik & Service</td>
+                <td><span class="badge badge-vvs">VVS</span></td>
+                <td>Anders Lindgren</td>
+                <td class="contractor-email"><a href="mailto:info@vvsteknik.se">info@vvsteknik.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4682345678">08-234 56 78</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+              <tr class="contractor-row" data-category="vvs" data-contractor='{"name":"Akut Ror & Varme AB","email":"akut@rorvarme.se","phone":"08-345 67 89","specialty":"VVS"}'>
+                <td class="contractor-name">Akut Ror & Varme AB</td>
+                <td><span class="badge badge-vvs">VVS</span></td>
+                <td>Mikael Svensson</td>
+                <td class="contractor-email"><a href="mailto:akut@rorvarme.se">akut@rorvarme.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4683456789">08-345 67 89</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- El -->
+              <tr class="contractor-row" data-category="el" data-contractor='{"name":"Eljouren 24/7","email":"jour@eljouren247.se","phone":"08-456 78 90","specialty":"El"}'>
+                <td class="contractor-name">Eljouren 24/7</td>
+                <td><span class="badge badge-el">El</span></td>
+                <td>Peter Nilsson</td>
+                <td class="contractor-email"><a href="mailto:jour@eljouren247.se">jour@eljouren247.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4684567890">08-456 78 90</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+              <tr class="contractor-row" data-category="el" data-contractor='{"name":"Stockholms Elinstallationer","email":"order@sthlmel.se","phone":"08-567 89 01","specialty":"El"}'>
+                <td class="contractor-name">Stockholms Elinstallationer</td>
+                <td><span class="badge badge-el">El</span></td>
+                <td>Lars Karlsson</td>
+                <td class="contractor-email"><a href="mailto:order@sthlmel.se">order@sthlmel.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4685678901">08-567 89 01</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- Bygg -->
+              <tr class="contractor-row" data-category="bygg" data-contractor='{"name":"Byggservice Stockholm","email":"info@byggservice.se","phone":"08-678 90 12","specialty":"Bygg"}'>
+                <td class="contractor-name">Byggservice Stockholm</td>
+                <td><span class="badge badge-bygg">Bygg</span></td>
+                <td>Johan Andersson</td>
+                <td class="contractor-email"><a href="mailto:info@byggservice.se">info@byggservice.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4686789012">08-678 90 12</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+              <tr class="contractor-row" data-category="bygg" data-contractor='{"name":"Snickeri & Bygg AB","email":"kontakt@snickeribygg.se","phone":"08-789 01 23","specialty":"Bygg"}'>
+                <td class="contractor-name">Snickeri & Bygg AB</td>
+                <td><span class="badge badge-bygg">Bygg</span></td>
+                <td>Fredrik Olsson</td>
+                <td class="contractor-email"><a href="mailto:kontakt@snickeribygg.se">kontakt@snickeribygg.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4687890123">08-789 01 23</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- Las -->
+              <tr class="contractor-row" data-category="las" data-contractor='{"name":"Lasjouren Stockholm","email":"jour@lasjouren.se","phone":"08-890 12 34","specialty":"Las"}'>
+                <td class="contractor-name">Lasjouren Stockholm</td>
+                <td><span class="badge badge-las">Las</span></td>
+                <td>Stefan Bergqvist</td>
+                <td class="contractor-email"><a href="mailto:jour@lasjouren.se">jour@lasjouren.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4688901234">08-890 12 34</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+              <tr class="contractor-row" data-category="las" data-contractor='{"name":"Sakerhetslasarna AB","email":"order@sakerhetslasarna.se","phone":"08-901 23 45","specialty":"Las"}'>
+                <td class="contractor-name">Sakerhetslasarna AB</td>
+                <td><span class="badge badge-las">Las</span></td>
+                <td>Magnus Ek</td>
+                <td class="contractor-email"><a href="mailto:order@sakerhetslasarna.se">order@sakerhetslasarna.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4689012345">08-901 23 45</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- Ventilation -->
+              <tr class="contractor-row" data-category="ventilation" data-contractor='{"name":"Ventilationsteknik AB","email":"service@venttek.se","phone":"08-012 34 56","specialty":"Ventilation"}'>
+                <td class="contractor-name">Ventilationsteknik AB</td>
+                <td><span class="badge badge-ventilation">Ventilation</span></td>
+                <td>Henrik Lund</td>
+                <td class="contractor-email"><a href="mailto:service@venttek.se">service@venttek.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4680123456">08-012 34 56</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+              <tr class="contractor-row" data-category="ventilation" data-contractor='{"name":"Klimat & Ventilation","email":"info@klimatvent.se","phone":"08-111 22 33","specialty":"Ventilation"}'>
+                <td class="contractor-name">Klimat & Ventilation</td>
+                <td><span class="badge badge-ventilation">Ventilation</span></td>
+                <td>Anna Stromberg</td>
+                <td class="contractor-email"><a href="mailto:info@klimatvent.se">info@klimatvent.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4681112233">08-111 22 33</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- Sanitet -->
+              <tr class="contractor-row" data-category="vvs" data-contractor='{"name":"Sanitetsproffsarna","email":"order@sanitetsproffs.se","phone":"08-222 33 44","specialty":"Sanitet"}'>
+                <td class="contractor-name">Sanitetsproffsarna</td>
+                <td><span class="badge badge-sanitet">Sanitet</span></td>
+                <td>Tobias Berg</td>
+                <td class="contractor-email"><a href="mailto:order@sanitetsproffs.se">order@sanitetsproffs.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4682223344">08-222 33 44</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- Maleri -->
+              <tr class="contractor-row" data-category="bygg" data-contractor='{"name":"Malarna i Stockholm","email":"offert@malarna.se","phone":"08-333 44 55","specialty":"Maleri"}'>
+                <td class="contractor-name">Malarna i Stockholm</td>
+                <td><span class="badge badge-maleri">Maleri</span></td>
+                <td>Maria Holm</td>
+                <td class="contractor-email"><a href="mailto:offert@malarna.se">offert@malarna.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4683334455">08-333 44 55</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- Golv -->
+              <tr class="contractor-row" data-category="bygg" data-contractor='{"name":"Golvlaggarna AB","email":"info@golvlaggarna.se","phone":"08-444 55 66","specialty":"Golv"}'>
+                <td class="contractor-name">Golvlaggarna AB</td>
+                <td><span class="badge badge-golv">Golv</span></td>
+                <td>Oskar Lindberg</td>
+                <td class="contractor-email"><a href="mailto:info@golvlaggarna.se">info@golvlaggarna.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4684445566">08-444 55 66</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+
+              <!-- General -->
+              <tr class="contractor-row" data-category="bygg" data-contractor='{"name":"Allround Fastighetsservice","email":"order@allroundfast.se","phone":"08-555 66 77","specialty":"Allround"}'>
+                <td class="contractor-name">Allround Fastighetsservice</td>
+                <td><span class="badge" style="background:#f1f5f9;color:#475569;">Allround</span></td>
+                <td>Karl Eriksson</td>
+                <td class="contractor-email"><a href="mailto:order@allroundfast.se">order@allroundfast.se</a></td>
+                <td class="contractor-phone"><a href="tel:+4685556677">08-555 66 77</a></td>
+                <td><span class="status-active"><span class="dot"></span>Aktiv</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+  <div class="toast" id="toast">
+    <i data-lucide="check-circle" class="icon"></i>
+    <span id="toast-message">Atgard utford</span>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  // Filter functionality
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  const rows = document.querySelectorAll('.contractor-row');
+
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const filter = tab.dataset.filter;
+      rows.forEach(row => {
+        if (filter === 'all' || row.dataset.category === filter) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Search functionality
+  const searchInput = document.getElementById('search-input');
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+
+  // Log for Rafter
+  console.log('Pigello Demo - Entreprenorer');
+  console.log('This page contains contractor data that Rafter can extract.');
+  console.log('Contractors are stored in data-contractor attributes on each row.');
+</script>
+</body>
+</html>

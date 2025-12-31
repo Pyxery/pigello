@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ärende #2024-0208 | Pigello</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: #fff; border-right: 1px solid #e2e8f0; position: fixed; height: 100vh; display: flex; flex-direction: column; }
+    .sidebar-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon { width: 32px; height: 32px; background: #5a6a72; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+    .logo-text { font-size: 17px; font-weight: 600; color: #374151; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 3px; color: #64748b; font-size: 13px; }
+    .nav-item.active { background: #e5e7eb; color: #374151; }
+    .sidebar-footer { padding: 16px; border-top: 1px solid #e2e8f0; }
+    .user-card { display: flex; align-items: center; gap: 12px; padding: 8px; }
+    .user-avatar { width: 34px; height: 34px; background: #6b7280; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px; }
+    .user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .user-role { font-size: 12px; color: #94a3b8; }
+    .main { flex: 1; margin-left: 260px; }
+    .topbar { height: 64px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 32px; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .breadcrumb a { color: #64748b; text-decoration: none; }
+    .breadcrumb-sep { color: #cbd5e1; }
+    .breadcrumb-current { color: #1e293b; font-weight: 500; }
+    .page { padding: 32px; }
+    .page-header { display: flex; justify-content: space-between; margin-bottom: 32px; }
+    .page-back { display: inline-flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; text-decoration: none; margin-bottom: 12px; }
+    .page-id { display: inline-block; font-size: 12px; color: #64748b; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .page-title { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .page-meta { display: flex; align-items: center; gap: 16px; font-size: 14px; color: #64748b; }
+    .status { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .status.urgent { background: #FEE2E2; color: #991B1B; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; border: 1px solid; cursor: pointer; }
+    .btn-primary { background: #475569; color: white; border-color: #475569; }
+    .btn-ghost { background: transparent; color: #64748b; border-color: transparent; }
+    .content-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+    .card { background: #fff; border-radius: 4px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+    .card-header { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; background: #f9fafb; }
+    .card-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #1e293b; text-transform: uppercase; }
+    .card-badge { font-size: 11px; color: #64748b; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+    .card-body { padding: 20px; }
+    .description { font-size: 14px; color: #475569; line-height: 1.7; }
+    .description p { margin-bottom: 12px; }
+    .description strong { color: #1e293b; }
+    .info-list { display: flex; flex-direction: column; gap: 16px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; }
+    .info-value { font-size: 14px; color: #1e293b; font-weight: 500; }
+    .form-section { margin-bottom: 24px; }
+    .form-textarea { width: 100%; min-height: 120px; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; }
+    .form-select { width: 100%; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #fff; }
+    .form-actions { display: flex; gap: 12px; margin-top: 16px; }
+    .warning-box { background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .warning-box strong { color: #991b1b; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-header"><a href="index.html" class="logo"><div class="logo-icon">P</div><span class="logo-text">Pigello</span></a></div>
+    <nav class="sidebar-nav"><a href="arenden.html" class="nav-item active"><i data-lucide="clipboard-list"></i>Ärenden</a></nav>
+    <div class="sidebar-footer"><div class="user-card"><div class="user-avatar">ML</div><div><div class="user-name">Maria Lindqvist</div><div class="user-role">Förvaltare</div></div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <nav class="breadcrumb">
+        <a href="index.html">Dashboard</a><span class="breadcrumb-sep">/</span>
+        <a href="arenden.html">Ärenden</a><span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">#2024-0208</span>
+      </nav>
+    </header>
+
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <a href="arenden.html" class="page-back"><i data-lucide="arrow-left"></i>Tillbaka</a>
+          <div class="page-id" data-case-id="2024-0208">Ärende #2024-0208</div>
+          <h1 class="page-title" data-field="title">Oro för hyresgäst - ingen sett henne på 2 veckor</h1>
+          <div class="page-meta">
+            <span class="page-meta-item"><i data-lucide="map-pin"></i><span data-field="address">Birger Jarlsgatan 45</span>, <span data-field="apartment">Lgh 903</span></span>
+            <span class="page-meta-item"><i data-lucide="tag"></i><span data-field="category">Välfärd/Akut</span></span>
+            <span class="page-meta-item"><i data-lucide="clock"></i><span data-field="created">2024-01-15, 13:15</span></span>
+          </div>
+        </div>
+        <div class="page-header-right">
+          <span class="status urgent" data-field="status"><span class="status-dot"></span>Akut</span>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="main-column">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="file-text"></i>Ärendebeskrivning</h2></div>
+            <div class="card-body">
+              <div class="warning-box">
+                <strong>⚠️ VARNING:</strong> Detta ärende kan innebära en allvarlig situation. Hantera med försiktighet och följ rutiner för välfärdskontroll.
+              </div>
+
+              <div class="description" data-field="description">
+                <p><strong>Anmälare:</strong> Granne i lgh 902 (Berit Holm, 070-555 66 77)</p>
+
+                <p><strong>Beskrivning:</strong> "Jag är orolig för min granne Margareta. Hon är 78 år och bor ensam. Vi brukar alltid ses i trapphuset och ta en kaffe tillsammans varannan dag, men jag har inte sett henne på nästan två veckor nu.</p>
+
+                <p>Jag har knackat på dörren flera gånger men ingen öppnar. Det ligger post och reklam utanför dörren som verkar ha legat där länge. Igår såg jag att det lyste i hallen genom springan under dörren, men lampan lyste hela natten vilket är ovanligt.</p>
+
+                <p>Margareta har ingen familj i närheten som jag vet om. Hon nämnde att hon har en systerdotter i Malmö men jag har inget nummer till henne. Margareta tar mediciner för hjärtat och sa en gång att hon inte mår bra om hon glömmer dem.</p>
+
+                <p>Jag ringde polisen men de sa att de inte kan göra något om det inte finns konkreta tecken på att något hänt. De sa att jag skulle kontakta hyresvärden."</p>
+
+                <p><strong>Observationer:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 12px;">
+                  <li>Ingen sett hyresgästen på ca 2 veckor</li>
+                  <li>Post ansamlad utanför dörren</li>
+                  <li>Ljus tänt konstant (onormalt mönster)</li>
+                  <li>Hyresgästen svarar inte på dörren eller telefon</li>
+                  <li>78 år, ensamboende, hjärtmedicin</li>
+                </ul>
+
+                <p><strong>Försök att nå hyresgästen:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 12px;">
+                  <li>Telefon (hem): Inget svar efter 10+ signaler</li>
+                  <li>Mobil: Går direkt till röstbrevlåda</li>
+                  <li>E-post: Inget svar (skickad igår)</li>
+                </ul>
+
+                <p><strong>OBS:</strong> Vi har inte kontaktuppgifter till anhöriga i vårt system.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="edit-3"></i>Intern anteckning</h2><span class="card-badge">Visas endast internt</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="intern-anteckning" class="form-textarea" placeholder="Skriv din interna anteckning här..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Spara</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="message-square"></i>Svar till anmälare</h2><span class="card-badge">Skickas via e-post</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="svar-hyresgast" class="form-textarea" placeholder="Skriv ditt meddelande till grannen som anmält..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Skicka</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="phone"></i>Kontakter att överväga</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Polis (välfärdskontroll)</span><span class="info-value">114 14 eller 112 vid akut oro</span></div>
+                <div class="info-item"><span class="info-label">Socialtjänsten</span><span class="info-value">Stockholms stad: 08-508 00 000</span></div>
+                <div class="info-item"><span class="info-label">Jourlåssmed</span><span class="info-value">Om tillträde behövs med myndighet</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-column">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="user"></i>Hyresgäst</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Namn</span><span class="info-value" data-field="tenant-name">Margareta Lindström</span></div>
+                <div class="info-item"><span class="info-label">Ålder</span><span class="info-value">78 år</span></div>
+                <div class="info-item"><span class="info-label">Telefon (hem)</span><span class="info-value"><a data-field="tenant-phone">08-765 43 21</a></span></div>
+                <div class="info-item"><span class="info-label">Mobil</span><span class="info-value">070-123 00 00 (röstbrevlåda)</span></div>
+                <div class="info-item"><span class="info-label">Adress</span><span class="info-value" data-field="tenant-address">Birger Jarlsgatan 45, Lgh 903</span></div>
+                <div class="info-item"><span class="info-label">Portkod</span><span class="info-value" data-field="door-code">1234</span></div>
+                <div class="info-item"><span class="info-label">Anhöriga</span><span class="info-value" style="color: #f59e0b;">Inga registrerade</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="alert-triangle"></i>Riskfaktorer</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Ålder</span><span class="info-value" style="color: #dc2626;">78 år - riskgrupp</span></div>
+                <div class="info-item"><span class="info-label">Boende</span><span class="info-value" style="color: #dc2626;">Ensamboende</span></div>
+                <div class="info-item"><span class="info-label">Hälsa</span><span class="info-value" style="color: #dc2626;">Hjärtmedicin</span></div>
+                <div class="info-item"><span class="info-label">Kontakt</span><span class="info-value" style="color: #dc2626;">Ej nåbar 2 veckor</span></div>
+                <div class="info-item"><span class="info-label">Socialt nätverk</span><span class="info-value" style="color: #f59e0b;">Begränsat (granne)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="user-check"></i>Anmälare</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Namn</span><span class="info-value">Berit Holm</span></div>
+                <div class="info-item"><span class="info-label">Lägenhet</span><span class="info-value">902 (granne)</span></div>
+                <div class="info-item"><span class="info-label">Telefon</span><span class="info-value">070-555 66 77</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

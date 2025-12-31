@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ärende #2024-0203 | Pigello</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; position: fixed; height: 100vh; }
+    .sidebar-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon { width: 32px; height: 32px; background: #5a6a72; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+    .logo-text { font-size: 17px; font-weight: 600; color: #374151; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 3px; color: #64748b; text-decoration: none; font-size: 13px; }
+    .nav-item.active { background: #e5e7eb; color: #374151; }
+    .sidebar-footer { padding: 16px; border-top: 1px solid #e2e8f0; }
+    .user-card { display: flex; align-items: center; gap: 12px; padding: 8px; }
+    .user-avatar { width: 34px; height: 34px; background: #6b7280; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px; }
+    .user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .user-role { font-size: 12px; color: #94a3b8; }
+    .main { flex: 1; margin-left: 260px; }
+    .topbar { height: 64px; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 32px; position: sticky; top: 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .breadcrumb a { color: #64748b; text-decoration: none; }
+    .breadcrumb-sep { color: #cbd5e1; }
+    .breadcrumb-current { color: #1e293b; font-weight: 500; }
+    .page { padding: 32px; }
+    .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+    .page-back { display: inline-flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; text-decoration: none; margin-bottom: 12px; }
+    .page-id { display: inline-block; font-size: 12px; color: #64748b; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .page-title { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .page-meta { display: flex; align-items: center; gap: 16px; font-size: 14px; color: #64748b; }
+    .page-meta-item { display: flex; align-items: center; gap: 6px; }
+    .status { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .status.urgent { background: #FEE2E2; color: #991B1B; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; border: 1px solid; cursor: pointer; }
+    .btn-primary { background: #475569; color: white; border-color: #475569; }
+    .btn-ghost { background: transparent; color: #64748b; border-color: transparent; }
+    .content-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+    .card { background: #ffffff; border-radius: 4px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+    .card-header { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; background: #f9fafb; }
+    .card-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #1e293b; text-transform: uppercase; }
+    .card-badge { font-size: 11px; color: #64748b; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+    .card-body { padding: 20px; }
+    .description { font-size: 14px; color: #475569; line-height: 1.7; }
+    .description p { margin-bottom: 12px; }
+    .description strong { color: #1e293b; }
+    .info-list { display: flex; flex-direction: column; gap: 16px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; }
+    .info-value { font-size: 14px; color: #1e293b; font-weight: 500; }
+    .info-value a { color: #4A7C94; text-decoration: none; }
+    .form-section { margin-bottom: 24px; }
+    .form-label { display: block; font-size: 13px; color: #374151; margin-bottom: 8px; }
+    .form-textarea { width: 100%; min-height: 120px; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; color: #1e293b; resize: vertical; }
+    .form-select { width: 100%; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #ffffff; }
+    .form-actions { display: flex; gap: 12px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-header"><a href="index.html" class="logo"><div class="logo-icon">P</div><span class="logo-text">Pigello</span></a></div>
+    <nav class="sidebar-nav"><a href="arenden.html" class="nav-item active"><i data-lucide="clipboard-list"></i>Ärenden</a></nav>
+    <div class="sidebar-footer"><div class="user-card"><div class="user-avatar">ML</div><div><div class="user-name">Maria Lindqvist</div><div class="user-role">Förvaltare</div></div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <nav class="breadcrumb">
+        <a href="index.html">Dashboard</a><span class="breadcrumb-sep">/</span>
+        <a href="arenden.html">Ärenden</a><span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">#2024-0203</span>
+      </nav>
+    </header>
+
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <a href="arenden.html" class="page-back"><i data-lucide="arrow-left"></i>Tillbaka</a>
+          <div class="page-id" data-case-id="2024-0203">Ärende #2024-0203</div>
+          <h1 class="page-title" data-field="title">Gaslukt i trapphuset - 89-årig hyresgäst</h1>
+          <div class="page-meta">
+            <span class="page-meta-item"><i data-lucide="map-pin"></i><span data-field="address">Vasagatan 12</span>, <span data-field="apartment">Lgh 101</span></span>
+            <span class="page-meta-item"><i data-lucide="tag"></i><span data-field="category">Gas/Akut</span></span>
+            <span class="page-meta-item"><i data-lucide="clock"></i><span data-field="created">2024-01-15, 14:02</span></span>
+          </div>
+        </div>
+        <div class="page-header-right">
+          <span class="status urgent" data-field="status"><span class="status-dot"></span>Brådskande</span>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="main-column">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="file-text"></i>Ärendebeskrivning</h2></div>
+            <div class="card-body">
+              <div class="description" data-field="description">
+                <p>OBS: Ärendet inkom via telefon från anhörig (dotter). Hyresgästen själv är 89 år och hör dåligt.</p>
+                <p>Dottern ringde och berättade att hennes mamma (Ingrid Karlsson i lgh 101) ringde henne och sa att det "luktar konstigt" i trapphuset, "lite som gas eller ruttna ägg". Dottern blev orolig eftersom mamman bor ensam och har nedsatt luktsinne pga ålder.</p>
+                <p>Mamman säger att lukten "kommer och går" och att hon märkte det först igår men "tänkte inte mer på det". Dottern försökte få henne att gå ut men mamman vill inte lämna lägenheten för det är "för kallt ute" och hon "mår bra".</p>
+                <p>Det finns ingen stadsgas i området men huset har gemensam gasanläggning för spisar (installerad 1962, senast besiktigad 2019). Dottern undrar om ni kan skicka någon DIREKT för att kolla. Hon bor själv i Göteborg och kan inte åka dit.</p>
+                <p><strong>VIKTIGT:</strong> Hyresgästen kan vara svår att nå på telefon pga hörselnedsättning. Dottern rekommenderar att ringa på dörren flera gånger och prata högt.</p>
+                <p><strong>Kontaktperson:</strong> Dottern Anna Svensson, 070-987 65 43 (vill bli kontaktad om vad som händer)</p>
+                <p><strong>Tillträde:</strong> Reservnyckel finns hos vicevärden Stig Persson (070-111 22 33)</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="edit-3"></i>Intern anteckning</h2><span class="card-badge">Visas endast internt</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="intern-anteckning" class="form-textarea" placeholder="Skriv din interna anteckning här..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Spara</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="message-square"></i>Svar till hyresgäst</h2><span class="card-badge">Skickas via e-post</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="svar-hyresgast" class="form-textarea" placeholder="Skriv ditt meddelande..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Skicka</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="wrench"></i>Arbetsorder</h2><span class="card-badge">Skickas till entreprenör</span></div>
+            <div class="card-body">
+              <div class="form-section">
+                <label class="form-label">Välj entreprenör</label>
+                <select id="entreprenor" class="form-select">
+                  <option value="">Välj entreprenör...</option>
+                  <option value="gasjouren">Gasjouren 24/7</option>
+                  <option value="energiservice">Energi & Gasservice AB</option>
+                  <option value="raddningstjansten">Kontakta Räddningstjänsten 112</option>
+                </select>
+              </div>
+              <div class="form-section"><textarea id="arbetsorder" class="form-textarea" placeholder="Beskriv arbetet..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Skicka</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-column">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="user"></i>Hyresgäst</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Namn</span><span class="info-value" data-field="tenant-name">Ingrid Karlsson</span></div>
+                <div class="info-item"><span class="info-label">Ålder</span><span class="info-value">89 år</span></div>
+                <div class="info-item"><span class="info-label">Telefon</span><span class="info-value"><a data-field="tenant-phone">08-123 45 67 (hör dåligt)</a></span></div>
+                <div class="info-item"><span class="info-label">Adress</span><span class="info-value" data-field="tenant-address">Vasagatan 12, Lgh 101</span></div>
+                <div class="info-item"><span class="info-label">Portkod</span><span class="info-value" data-field="door-code">4455</span></div>
+                <div class="info-item"><span class="info-label">Anhörig</span><span class="info-value">Anna Svensson (dotter)<br>070-987 65 43</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="alert-triangle"></i>Riskbedömning</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Potentiell gasläcka</span><span class="info-value" style="color: #dc2626;">JA - Kräver omedelbar åtgärd</span></div>
+                <div class="info-item"><span class="info-label">Sårbar hyresgäst</span><span class="info-value" style="color: #dc2626;">JA - Äldre, nedsatt hörsel/lukt</span></div>
+                <div class="info-item"><span class="info-label">Gasanläggning</span><span class="info-value">Gemensam, installerad 1962</span></div>
+                <div class="info-item"><span class="info-label">Senaste besiktning</span><span class="info-value" style="color: #f59e0b;">2019 (5 år sedan)</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

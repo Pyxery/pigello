@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ärenden - Pigello</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #64748b;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .nav-item.active {
+      background: #f1f5f9;
+      color: #6366f1;
+    }
+
+    .nav-item .icon {
+      width: 20px;
+      height: 20px;
+      stroke-width: 1.75;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: #fee2e2;
+      color: #dc2626;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .nav-badge.gray {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .user-card:hover {
+      background: #f1f5f9;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      margin-left: 260px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 16px;
+      width: 400px;
+      transition: all 0.15s;
+    }
+
+    .search-box:focus-within {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .search-box .icon {
+      width: 18px;
+      height: 18px;
+      color: #94a3b8;
+    }
+
+    .search-box input {
+      flex: 1;
+      border: none;
+      background: none;
+      font-size: 14px;
+      color: #1e293b;
+      outline: none;
+    }
+
+    .search-box input::placeholder {
+      color: #94a3b8;
+    }
+
+    .search-shortcut {
+      font-size: 11px;
+      color: #94a3b8;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .topbar-btn:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .topbar-btn .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .notification-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+    }
+
+    /* Page Content */
+    .page {
+      padding: 32px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .page-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .page-count {
+      font-size: 13px;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .filter-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-tab:hover {
+      color: #1e293b;
+    }
+
+    .filter-tab.active {
+      background: #ffffff;
+      color: #1e293b;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .filter-separator {
+      width: 1px;
+      height: 24px;
+      background: #e2e8f0;
+    }
+
+    .filter-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-dropdown:hover {
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
+
+    .filter-dropdown .icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Cards */
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    /* Table */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      text-align: left;
+      padding: 14px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .table td {
+      padding: 16px;
+      font-size: 14px;
+      color: #1e293b;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .table tr {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    /* Status Badge */
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status.urgent {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    .status.active {
+      background: #E5E7EB;
+      color: #374151;
+    }
+
+    .status.pending {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .status.completed {
+      background: #E5E7EB;
+      color: #6B7280;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Priority */
+    .priority {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .priority.high {
+      color: #374151;
+    }
+
+    .priority.medium {
+      color: #6B7280;
+    }
+
+    .priority.low {
+      color: #9CA3AF;
+    }
+
+    /* Case Row */
+    .case-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .case-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .case-icon.vvs {
+      background: #eff6ff;
+      color: #3b82f6;
+    }
+
+    .case-icon.el {
+      background: #fef9c3;
+      color: #ca8a04;
+    }
+
+    .case-icon.varme {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .case-icon.las {
+      background: #e0e7ff;
+      color: #4f46e5;
+    }
+
+    .case-icon.ovrigt {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .case-icon .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .case-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .case-title {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+
+    .case-meta {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .case-time {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* Tenant */
+    .tenant {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tenant-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #e0e7ff;
+      color: #4f46e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .tenant-name {
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn .icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn-primary {
+      background: #475569;
+      color: white;
+      border-color: #475569;
+    }
+
+    .btn-primary:hover {
+      background: #334155;
+      border-color: #334155;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .pagination-info {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .pagination-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-btn .icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .pagination-pages {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pagination-page {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .pagination-page:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .pagination-page.active {
+      background: #6366f1;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">P</div>
+        <span class="logo-text">Pigello</span>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Översikt</div>
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard" class="icon"></i>
+          Dashboard
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Förvaltning</div>
+        <a href="#" class="nav-item">
+          <i data-lucide="building-2" class="icon"></i>
+          Fastigheter
+          <span class="nav-badge gray">24</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="users" class="icon"></i>
+          Hyresgäster
+          <span class="nav-badge gray">847</span>
+        </a>
+        <a href="arenden.html" class="nav-item active">
+          <i data-lucide="clipboard-list" class="icon"></i>
+          Ärenden
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="entreprenorer.html" class="nav-item">
+          <i data-lucide="hard-hat" class="icon"></i>
+          Entreprenörer
+          <span class="nav-badge gray">15</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="file-text" class="icon"></i>
+          Avtal
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Ekonomi</div>
+        <a href="#" class="nav-item">
+          <i data-lucide="credit-card" class="icon"></i>
+          Hyresavier
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="bar-chart-3" class="icon"></i>
+          Rapporter
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">System</div>
+        <a href="#" class="nav-item">
+          <i data-lucide="settings" class="icon"></i>
+          Inställningar
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">ML</div>
+        <div class="user-info">
+          <div class="user-name">Maria Lindqvist</div>
+          <div class="user-role">Förvaltare</div>
+        </div>
+        <i data-lucide="chevron-down" class="icon" style="width: 16px; height: 16px; color: #94a3b8;"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <div class="search-box">
+        <i data-lucide="search" class="icon"></i>
+        <input type="text" placeholder="Sök fastigheter, hyresgäster, ärenden...">
+        <span class="search-shortcut">⌘K</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn">
+          <i data-lucide="bell" class="icon"></i>
+          <span class="notification-dot"></span>
+        </button>
+        <button class="topbar-btn">
+          <i data-lucide="help-circle" class="icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Ärenden</h1>
+          <span class="page-count">12 öppna</span>
+        </div>
+        <button class="btn btn-primary">
+          <i data-lucide="plus" class="icon"></i>
+          Nytt ärende
+        </button>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-tabs">
+          <button class="filter-tab active">Alla</button>
+          <button class="filter-tab">Brådskande</button>
+          <button class="filter-tab">Pågående</button>
+          <button class="filter-tab">Väntar</button>
+          <button class="filter-tab">Åtgärdade</button>
+        </div>
+        <div class="filter-separator"></div>
+        <button class="filter-dropdown">
+          <i data-lucide="building-2" class="icon"></i>
+          Alla fastigheter
+          <i data-lucide="chevron-down" class="icon"></i>
+        </button>
+        <button class="filter-dropdown">
+          <i data-lucide="tag" class="icon"></i>
+          Alla kategorier
+          <i data-lucide="chevron-down" class="icon"></i>
+        </button>
+      </div>
+
+      <!-- Cases Table -->
+      <div class="card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Ärende</th>
+              <th>Hyresgäst</th>
+              <th>Adress</th>
+              <th>Status</th>
+              <th>Prioritet</th>
+              <th>Skapad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Test Case 1: Angry repeat complaint -->
+            <tr onclick="window.location='arende-test-1.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon ovrigt">
+                    <i data-lucide="volume-2" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Granne spelar musik hela natten - TREDJE GÅNGEN!</div>
+                    <div class="case-meta">Störning • #2024-0201</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">FA</div>
+                  <span class="tenant-name">Fatima Al-Hassan</span>
+                </div>
+              </td>
+              <td>Kungsgatan 15, Lgh 402</td>
+              <td><span class="status urgent"><span class="status-dot"></span>Brådskande</span></td>
+              <td><span class="priority high">Hög</span></td>
+              <td class="case-time">Idag 03:47</td>
+            </tr>
+            <!-- Test Case 2: Vague mold description -->
+            <tr onclick="window.location='arende-test-2.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon ovrigt">
+                    <i data-lucide="help-circle" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Mögel eller nåt i badrummet kanske?</div>
+                    <div class="case-meta">Övrigt • #2024-0202</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">EN</div>
+                  <span class="tenant-name">Elin Norberg</span>
+                </div>
+              </td>
+              <td>Drottninggatan 88, Lgh 1501</td>
+              <td><span class="status pending"><span class="status-dot"></span>Väntar</span></td>
+              <td><span class="priority medium">Medium</span></td>
+              <td class="case-time">Igår 19:22</td>
+            </tr>
+            <!-- Test Case 3: Gas smell elderly -->
+            <tr onclick="window.location='arende-test-3.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon varme">
+                    <i data-lucide="flame" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Gaslukt i trapphuset - 89-årig hyresgäst</div>
+                    <div class="case-meta">Gas/Akut • #2024-0203</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">IK</div>
+                  <span class="tenant-name">Ingrid Karlsson</span>
+                </div>
+              </td>
+              <td>Vasagatan 12, Lgh 101</td>
+              <td><span class="status urgent"><span class="status-dot"></span>Brådskande</span></td>
+              <td><span class="priority high">Hög</span></td>
+              <td class="case-time">Idag 14:02</td>
+            </tr>
+            <!-- Test Case 4: Refusing access -->
+            <tr onclick="window.location='arende-test-4.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon las">
+                    <i data-lucide="shield-x" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Hyresgäst vägrar släppa in hantverkare</div>
+                    <div class="case-meta">Tillträde • #2024-0204</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">ME</div>
+                  <span class="tenant-name">Magnus Ekström</span>
+                </div>
+              </td>
+              <td>Sveavägen 55, Lgh 704</td>
+              <td><span class="status active"><span class="status-dot"></span>Pågående</span></td>
+              <td><span class="priority medium">Medium</span></td>
+              <td class="case-time">Idag 10:15</td>
+            </tr>
+            <!-- Test Case 5: Language barrier multiple issues -->
+            <tr onclick="window.location='arende-test-5.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon vvs">
+                    <i data-lucide="droplet" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Problem med lägenhet (svårtolkad beskrivning)</div>
+                    <div class="case-meta">Flera problem • #2024-0205</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">AR</div>
+                  <span class="tenant-name">Ahmad Rashid</span>
+                </div>
+              </td>
+              <td>Norrtullsgatan 23, Lgh 308</td>
+              <td><span class="status pending"><span class="status-dot"></span>Väntar på info</span></td>
+              <td><span class="priority high">Hög</span></td>
+              <td class="case-time">Idag 16:45</td>
+            </tr>
+            <!-- Test Case 6: Recurring bed bugs -->
+            <tr onclick="window.location='arende-test-6.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon ovrigt">
+                    <i data-lucide="bug" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Skadedjur - vägglöss (TREDJE BEHANDLINGEN)</div>
+                    <div class="case-meta">Skadedjur • #2024-0206</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">LB</div>
+                  <span class="tenant-name">Linda Björk</span>
+                </div>
+              </td>
+              <td>Fridhemsplan 8, Lgh 205</td>
+              <td><span class="status active"><span class="status-dot"></span>Pågående</span></td>
+              <td><span class="priority high">Hög</span></td>
+              <td class="case-time">Idag 11:30</td>
+            </tr>
+            <!-- Test Case 7: Unauthorized renovations -->
+            <tr onclick="window.location='arende-test-7.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon ovrigt">
+                    <i data-lucide="hammer" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Hyresgästen har byggt om utan tillstånd</div>
+                    <div class="case-meta">Otillåten ändring • #2024-0207</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">JB</div>
+                  <span class="tenant-name">Joakim Berglund</span>
+                </div>
+              </td>
+              <td>Odenplan 3, Lgh 602</td>
+              <td><span class="status pending"><span class="status-dot"></span>Utredning</span></td>
+              <td><span class="priority high">Hög</span></td>
+              <td class="case-time">Idag 09:00</td>
+            </tr>
+            <!-- Test Case 8: Welfare check -->
+            <tr onclick="window.location='arende-test-8.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon varme">
+                    <i data-lucide="heart" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Oro för hyresgäst - ingen sett henne på 2 veckor</div>
+                    <div class="case-meta">Välfärd/Akut • #2024-0208</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">ML</div>
+                  <span class="tenant-name">Margareta Lindström</span>
+                </div>
+              </td>
+              <td>Birger Jarlsgatan 45, Lgh 903</td>
+              <td><span class="status urgent"><span class="status-dot"></span>Akut</span></td>
+              <td><span class="priority high">Hög</span></td>
+              <td class="case-time">Idag 13:15</td>
+            </tr>
+            <!-- Test Case 9: Dispute tenant vs technician -->
+            <tr onclick="window.location='arende-test-9.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon ovrigt">
+                    <i data-lucide="wrench" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">Fel på diskmaskin - hyresgäst och tekniker oense</div>
+                    <div class="case-meta">Vitvaror • #2024-0209</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">KÖ</div>
+                  <span class="tenant-name">Kristina Öberg</span>
+                </div>
+              </td>
+              <td>Karlavägen 72, Lgh 405</td>
+              <td><span class="status active"><span class="status-dot"></span>Pågående</span></td>
+              <td><span class="priority medium">Medium</span></td>
+              <td class="case-time">Idag 15:30</td>
+            </tr>
+            <!-- Test Case 10: Mystery sounds -->
+            <tr onclick="window.location='arende-test-10.html'">
+              <td>
+                <div class="case-row">
+                  <div class="case-icon ovrigt">
+                    <i data-lucide="ghost" class="icon"></i>
+                  </div>
+                  <div class="case-info">
+                    <div class="case-title">"Spöken" i lägenheten - konstiga ljud på natten</div>
+                    <div class="case-meta">Oklassificerat • #2024-0210</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="tenant">
+                  <div class="tenant-avatar">JÅ</div>
+                  <span class="tenant-name">Josefin Åkerlund</span>
+                </div>
+              </td>
+              <td>Rådmansgatan 18, Lgh 201</td>
+              <td><span class="status pending"><span class="status-dot"></span>Väntar</span></td>
+              <td><span class="priority medium">Medium</span></td>
+              <td class="case-time">Igår 22:14</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span class="pagination-info">Visar 1-10 av 10 ärenden</span>
+          <div class="pagination-controls">
+            <button class="pagination-btn" disabled>
+              <i data-lucide="chevron-left" class="icon"></i>
+            </button>
+            <div class="pagination-pages">
+              <button class="pagination-page active">1</button>
+            </div>
+            <button class="pagination-btn" disabled>
+              <i data-lucide="chevron-right" class="icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

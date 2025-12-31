@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ärende #2024-0210 | Pigello</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: #fff; border-right: 1px solid #e2e8f0; position: fixed; height: 100vh; display: flex; flex-direction: column; }
+    .sidebar-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon { width: 32px; height: 32px; background: #5a6a72; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+    .logo-text { font-size: 17px; font-weight: 600; color: #374151; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 3px; color: #64748b; font-size: 13px; }
+    .nav-item.active { background: #e5e7eb; color: #374151; }
+    .sidebar-footer { padding: 16px; border-top: 1px solid #e2e8f0; }
+    .user-card { display: flex; align-items: center; gap: 12px; padding: 8px; }
+    .user-avatar { width: 34px; height: 34px; background: #6b7280; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px; }
+    .user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .user-role { font-size: 12px; color: #94a3b8; }
+    .main { flex: 1; margin-left: 260px; }
+    .topbar { height: 64px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 32px; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .breadcrumb a { color: #64748b; text-decoration: none; }
+    .breadcrumb-sep { color: #cbd5e1; }
+    .breadcrumb-current { color: #1e293b; font-weight: 500; }
+    .page { padding: 32px; }
+    .page-header { display: flex; justify-content: space-between; margin-bottom: 32px; }
+    .page-back { display: inline-flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; text-decoration: none; margin-bottom: 12px; }
+    .page-id { display: inline-block; font-size: 12px; color: #64748b; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .page-title { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .page-meta { display: flex; align-items: center; gap: 16px; font-size: 14px; color: #64748b; }
+    .status { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .status.pending { background: #FEF3C7; color: #92400E; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; border: 1px solid; cursor: pointer; }
+    .btn-primary { background: #475569; color: white; border-color: #475569; }
+    .btn-ghost { background: transparent; color: #64748b; border-color: transparent; }
+    .content-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+    .card { background: #fff; border-radius: 4px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+    .card-header { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; background: #f9fafb; }
+    .card-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #1e293b; text-transform: uppercase; }
+    .card-badge { font-size: 11px; color: #64748b; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+    .card-body { padding: 20px; }
+    .description { font-size: 14px; color: #475569; line-height: 1.7; }
+    .description p { margin-bottom: 12px; }
+    .description strong { color: #1e293b; }
+    .info-list { display: flex; flex-direction: column; gap: 16px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; }
+    .info-value { font-size: 14px; color: #1e293b; font-weight: 500; }
+    .form-section { margin-bottom: 24px; }
+    .form-textarea { width: 100%; min-height: 120px; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; }
+    .form-select { width: 100%; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #fff; }
+    .form-actions { display: flex; gap: 12px; margin-top: 16px; }
+    .quote-box { background: #f8fafc; border-left: 3px solid #94a3b8; padding: 12px 16px; margin: 12px 0; font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-header"><a href="index.html" class="logo"><div class="logo-icon">P</div><span class="logo-text">Pigello</span></a></div>
+    <nav class="sidebar-nav"><a href="arenden.html" class="nav-item active"><i data-lucide="clipboard-list"></i>Ärenden</a></nav>
+    <div class="sidebar-footer"><div class="user-card"><div class="user-avatar">ML</div><div><div class="user-name">Maria Lindqvist</div><div class="user-role">Förvaltare</div></div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <nav class="breadcrumb">
+        <a href="index.html">Dashboard</a><span class="breadcrumb-sep">/</span>
+        <a href="arenden.html">Ärenden</a><span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">#2024-0210</span>
+      </nav>
+    </header>
+
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <a href="arenden.html" class="page-back"><i data-lucide="arrow-left"></i>Tillbaka</a>
+          <div class="page-id" data-case-id="2024-0210">Ärende #2024-0210</div>
+          <h1 class="page-title" data-field="title">"Spöken" i lägenheten - konstiga ljud på natten</h1>
+          <div class="page-meta">
+            <span class="page-meta-item"><i data-lucide="map-pin"></i><span data-field="address">Rådmansgatan 18</span>, <span data-field="apartment">Lgh 201</span></span>
+            <span class="page-meta-item"><i data-lucide="tag"></i><span data-field="category">Oklassificerat</span></span>
+            <span class="page-meta-item"><i data-lucide="clock"></i><span data-field="created">2024-01-15, 22:14</span></span>
+          </div>
+        </div>
+        <div class="page-header-right">
+          <span class="status pending" data-field="status"><span class="status-dot"></span>Väntar</span>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="main-column">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="file-text"></i>Ärendebeskrivning</h2></div>
+            <div class="card-body">
+              <div class="description" data-field="description">
+                <p><strong>Meddelande från hyresgäst (mottaget 22:14):</strong></p>
+
+                <div class="quote-box">
+                  <p>"Hej, jag vet att det här låter konstigt men jag måste berätta om det som händer i min lägenhet. Varje natt mellan ca 02:00-04:00 hörs det märkliga ljud. Det är som ett dovt dunkande som kommer inifrån väggarna, ibland som ett skrapande, och ibland som någon går i lägenheten fast jag är ensam.</p>
+
+                  <p>Jag har bott här i 8 månader och det började för typ 3 veckor sedan. Först trodde jag att det var grannar men ljuden kommer INIFRÅN väggarna, inte från sidorna. Det är värst i sovrummet och i köket vid kylskåpet.</p>
+
+                  <p>Min kompis som var över i helgen hörde det också så jag inbillar mig inte! Hon sa att det lät som 'något som rör sig i väggarna'. Jag vågar knappt sova längre.</p>
+
+                  <p>Jag googlade och läste att det kan vara allt från rör som expanderar till... ja, skadedjur. Eller värre. Huset är gammalt (1920-tal?) så vem vet vad som finns i väggarna.</p>
+
+                  <p>Kan ni skicka någon som kollar? Jag vet inte ens vem som ska komma - VVS? Skadedjur? Spökjägare? Haha, men seriöst, jag behöver hjälp. Sover hos min mamma just nu för jag pallar inte mer."</p>
+                </div>
+
+                <p><strong>Möjliga förklaringar att undersöka:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 12px;">
+                  <li><strong>Rör/VVS:</strong> Värmesystem, varmvatten - expansionsljud, luftfickor i systemet, vattenslag</li>
+                  <li><strong>Skadedjur:</strong> Möss, råttor, mårdhund? (sällsynt men förekommer i äldre hus)</li>
+                  <li><strong>Ventilation:</strong> Fläktar, kanaler som vibrerar</li>
+                  <li><strong>Hiss:</strong> Närmaste hiss? Maskinrum?</li>
+                  <li><strong>Grannar:</strong> Nattarbetande granne? (men hyresgästen säger ljuden kommer inifrån väggarna)</li>
+                  <li><strong>Byggnaden:</strong> Gammalt hus - träbjälklag som rör sig vid temperaturväxlingar?</li>
+                </ul>
+
+                <p><strong>Fastighetens ålder:</strong> Byggår 1923, renoverad 2008<br>
+                <strong>Uppvärmning:</strong> Fjärrvärme med radiatorer<br>
+                <strong>Senaste VVS-problem:</strong> Luftning av radiatorer okt 2023 (annat trapphus)</p>
+
+                <p><strong>Tillträde:</strong> Hyresgästen bor tillfälligt hos sin mamma men kan möta upp. "Ring gärna kvällstid efter 17, jobbar som lärare."</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="edit-3"></i>Intern anteckning</h2><span class="card-badge">Visas endast internt</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="intern-anteckning" class="form-textarea" placeholder="Skriv din interna anteckning här..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Spara</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="message-square"></i>Svar till hyresgäst</h2><span class="card-badge">Skickas via e-post</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="svar-hyresgast" class="form-textarea" placeholder="Skriv ditt meddelande..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Skicka</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="wrench"></i>Arbetsorder</h2><span class="card-badge">Skickas till entreprenör</span></div>
+            <div class="card-body">
+              <div class="form-section">
+                <label class="form-label">Välj entreprenör</label>
+                <select id="entreprenor" class="form-select">
+                  <option value="">Välj entreprenör...</option>
+                  <option value="vvs">VVS-Teknik (rörsystem)</option>
+                  <option value="anticimex">Anticimex (skadedjur)</option>
+                  <option value="fastighet">Fastighetstekniker (allmän inspektion)</option>
+                  <option value="ventilation">Ventilationsservice</option>
+                </select>
+              </div>
+              <div class="form-section"><textarea id="arbetsorder" class="form-textarea" placeholder="Beskriv arbetet..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary">Skicka</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-column">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="user"></i>Hyresgäst</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Namn</span><span class="info-value" data-field="tenant-name">Josefin Åkerlund</span></div>
+                <div class="info-item"><span class="info-label">Telefon</span><span class="info-value"><a data-field="tenant-phone">070-888 99 00</a></span></div>
+                <div class="info-item"><span class="info-label">E-post</span><span class="info-value"><a data-field="tenant-email">josefin.akerlund@edu.stockholm.se</a></span></div>
+                <div class="info-item"><span class="info-label">Adress</span><span class="info-value" data-field="tenant-address">Rådmansgatan 18, Lgh 201</span></div>
+                <div class="info-item"><span class="info-label">Portkod</span><span class="info-value" data-field="door-code">8822</span></div>
+                <div class="info-item"><span class="info-label">Bor där sedan</span><span class="info-value">Maj 2023</span></div>
+                <div class="info-item"><span class="info-label">Kontakttid</span><span class="info-value">Efter kl 17:00</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="building"></i>Fastighetsinfo</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Byggår</span><span class="info-value">1923</span></div>
+                <div class="info-item"><span class="info-label">Senaste renovering</span><span class="info-value">2008</span></div>
+                <div class="info-item"><span class="info-label">Uppvärmning</span><span class="info-value">Fjärrvärme</span></div>
+                <div class="info-item"><span class="info-label">Våningsplan</span><span class="info-value">2 av 5</span></div>
+                <div class="info-item"><span class="info-label">Ovanförliggande lgh</span><span class="info-value">301 - Bengt Eriksson</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="clock"></i>Tidsmönster</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Tid för ljud</span><span class="info-value">02:00 - 04:00</span></div>
+                <div class="info-item"><span class="info-label">Startade</span><span class="info-value">~3 veckor sedan</span></div>
+                <div class="info-item"><span class="info-label">Plats i lgh</span><span class="info-value">Sovrum, Kök (vid kylskåp)</span></div>
+                <div class="info-item"><span class="info-label">Karaktär</span><span class="info-value">Dunkande, skrapande</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

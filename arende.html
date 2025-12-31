@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ärende #2024-0142 | Pigello</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+    .app { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+    .sidebar-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: #5a6a72;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 13px;
+    }
+    .logo-text { font-size: 17px; font-weight: 600; color: #374151; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title {
+      font-size: 11px; font-weight: 600; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0 12px; margin-bottom: 8px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: 3px;
+      color: #64748b; text-decoration: none;
+      font-size: 13px; font-weight: 500;
+      transition: all 0.1s; cursor: pointer;
+      border-left: 2px solid transparent;
+    }
+    .nav-item:hover { background: #f1f5f9; color: #1e293b; }
+    .nav-item.active { background: #e5e7eb; color: #374151; border-left-color: #6b7280; }
+    .nav-item .icon { width: 20px; height: 20px; stroke-width: 1.75; }
+    .nav-badge {
+      margin-left: auto;
+      background: #fee2e2; color: #dc2626;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 10px;
+    }
+    .nav-badge.gray { background: #f1f5f9; color: #64748b; }
+    .sidebar-footer { padding: 16px; border-top: 1px solid #e2e8f0; }
+    .user-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px; border-radius: 8px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .user-card:hover { background: #f1f5f9; }
+    .user-avatar {
+      width: 34px; height: 34px;
+      background: #6b7280;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 600; font-size: 12px;
+    }
+    .user-info { flex: 1; }
+    .user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .user-role { font-size: 12px; color: #94a3b8; }
+
+    /* Main */
+    .main { flex: 1; margin-left: 260px; min-height: 100vh; }
+    .topbar {
+      height: 64px; background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; position: sticky; top: 0; z-index: 50;
+    }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .breadcrumb a { color: #64748b; text-decoration: none; }
+    .breadcrumb a:hover { color: #374151; }
+    .breadcrumb-sep { color: #cbd5e1; }
+    .breadcrumb-current { color: #1e293b; font-weight: 500; }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    .topbar-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: none; background: transparent; color: #64748b;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; position: relative;
+    }
+    .topbar-btn:hover { background: #f1f5f9; color: #1e293b; }
+    .topbar-btn .icon { width: 20px; height: 20px; }
+
+    /* Page */
+    .page { padding: 32px; }
+    .page-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 32px;
+    }
+    .page-header-left { flex: 1; }
+    .page-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #64748b; font-size: 13px; text-decoration: none;
+      margin-bottom: 12px;
+    }
+    .page-back:hover { color: #374151; }
+    .page-back .icon { width: 16px; height: 16px; }
+    .page-id {
+      display: inline-block;
+      font-size: 12px; font-weight: 500; color: #64748b;
+      background: #f1f5f9; padding: 4px 10px; border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .page-title { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .page-meta {
+      display: flex; align-items: center; gap: 16px;
+      font-size: 14px; color: #64748b;
+    }
+    .page-meta-item { display: flex; align-items: center; gap: 6px; }
+    .page-meta-item .icon { width: 16px; height: 16px; color: #94a3b8; }
+    .page-header-right { display: flex; gap: 12px; }
+
+    /* Status */
+    .status {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 500;
+    }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .status.urgent { background: #FEE2E2; color: #991B1B; }
+    .status.active { background: #E5E7EB; color: #374151; }
+    .status.pending { background: #FEF3C7; color: #92400E; }
+    .status.completed { background: #E5E7EB; color: #6B7280; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 3px;
+      font-size: 13px; font-weight: 500;
+      border: 1px solid; cursor: pointer; transition: all 0.1s;
+    }
+    .btn .icon { width: 16px; height: 16px; }
+    .btn-primary { background: #475569; color: white; border-color: #475569; }
+    .btn-primary:hover { background: #334155; border-color: #334155; }
+    .btn-secondary { background: #ffffff; color: #374151; border-color: #e2e8f0; }
+    .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn-success { background: #475569; color: white; border-color: #475569; }
+    .btn-success:hover { background: #334155; border-color: #334155; }
+    .btn-ghost { background: transparent; color: #64748b; border-color: transparent; }
+    .btn-ghost:hover { background: #f1f5f9; color: #1e293b; }
+
+    /* Content Grid */
+    .content-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+
+    /* Cards */
+    .card {
+      background: #ffffff; border-radius: 4px;
+      border: 1px solid #e2e8f0; margin-bottom: 20px;
+    }
+    .card:last-child { margin-bottom: 0; }
+    .card-header {
+      padding: 12px 16px; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between;
+      background: #f9fafb;
+    }
+    .card-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: #1e293b;
+      text-transform: uppercase; letter-spacing: 0.02em;
+    }
+    .card-title .icon { width: 16px; height: 16px; color: #6B7280; }
+    .card-badge {
+      font-size: 11px; font-weight: 500; color: #64748b;
+      background: #f1f5f9; padding: 4px 8px; border-radius: 4px;
+    }
+    .card-body { padding: 20px; }
+
+    /* Description */
+    .description { font-size: 14px; color: #475569; line-height: 1.7; }
+    .description p { margin-bottom: 12px; }
+    .description p:last-child { margin-bottom: 0; }
+    .description strong { color: #1e293b; font-weight: 600; }
+
+    /* Info List */
+    .info-list { display: flex; flex-direction: column; gap: 16px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-label { font-size: 12px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.03em; }
+    .info-value { font-size: 14px; color: #1e293b; font-weight: 500; }
+    .info-value a { color: #4A7C94; text-decoration: none; }
+    .info-value a:hover { text-decoration: underline; }
+
+    /* Form */
+    .form-section { margin-bottom: 24px; }
+    .form-section:last-child { margin-bottom: 0; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 500;
+      color: #374151; margin-bottom: 8px;
+    }
+    .form-textarea {
+      width: 100%; min-height: 120px; padding: 12px 16px;
+      border: 1px solid #e2e8f0; border-radius: 8px;
+      font-size: 14px; font-family: inherit; color: #1e293b;
+      resize: vertical; transition: all 0.15s;
+    }
+    .form-textarea:focus {
+      outline: none; border-color: #6b7280;
+    }
+    .form-textarea::placeholder { color: #94a3b8; }
+    .form-hint { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+    .form-actions { display: flex; gap: 12px; margin-top: 16px; }
+
+    .form-select {
+      width: 100%; padding: 10px 16px; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-size: 14px; font-family: inherit;
+      color: #1e293b; background: #ffffff; cursor: pointer;
+    }
+    .form-select:focus {
+      outline: none; border-color: #6b7280;
+    }
+
+    /* Timeline */
+    .timeline { display: flex; flex-direction: column; }
+    .timeline-item {
+      display: flex; gap: 12px; padding: 12px 0;
+      position: relative;
+    }
+    .timeline-item:not(:last-child)::before {
+      content: ''; position: absolute;
+      left: 11px; top: 36px; bottom: 0; width: 2px;
+      background: #e2e8f0;
+    }
+    .timeline-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #f1f5f9; border: 2px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .timeline-dot .icon { width: 12px; height: 12px; color: #64748b; }
+    .timeline-item.active .timeline-dot {
+      background: #4A7C94; border-color: #4A7C94;
+    }
+    .timeline-item.active .timeline-dot .icon { color: white; }
+    .timeline-content { flex: 1; padding-top: 2px; }
+    .timeline-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 4px;
+    }
+    .timeline-title { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .timeline-time { font-size: 12px; color: #94a3b8; }
+    .timeline-text { font-size: 13px; color: #64748b; }
+
+    /* Card Colors - all neutral gray for legacy look */
+    .card.green,
+    .card.blue,
+    .card.orange,
+    .card.purple { border-left: 3px solid #D1D5DB; }
+
+    /* Toast */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+    .toast {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; background: #1e293b; color: white;
+      border-radius: 10px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast .icon { width: 20px; height: 20px; color: #22c55e; }
+    .toast.error .icon { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">P</div>
+        <span class="logo-text">Pigello</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Översikt</div>
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard" class="icon"></i>
+          Dashboard
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Förvaltning</div>
+        <a href="#" class="nav-item">
+          <i data-lucide="building-2" class="icon"></i>
+          Fastigheter
+          <span class="nav-badge gray">24</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="users" class="icon"></i>
+          Hyresgäster
+          <span class="nav-badge gray">847</span>
+        </a>
+        <a href="arenden.html" class="nav-item active">
+          <i data-lucide="clipboard-list" class="icon"></i>
+          Ärenden
+          <span class="nav-badge">12</span>
+        </a>
+        <a href="entreprenorer.html" class="nav-item">
+          <i data-lucide="hard-hat" class="icon"></i>
+          Entreprenörer
+          <span class="nav-badge gray">15</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="file-text" class="icon"></i>
+          Avtal
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Ekonomi</div>
+        <a href="#" class="nav-item">
+          <i data-lucide="credit-card" class="icon"></i>
+          Hyresavier
+        </a>
+        <a href="#" class="nav-item">
+          <i data-lucide="bar-chart-3" class="icon"></i>
+          Rapporter
+        </a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">ML</div>
+        <div class="user-info">
+          <div class="user-name">Maria Lindqvist</div>
+          <div class="user-role">Förvaltare</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <nav class="breadcrumb">
+        <a href="index.html">Dashboard</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="arenden.html">Ärenden</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">#2024-0142</span>
+      </nav>
+      <div class="topbar-actions">
+        <button class="topbar-btn">
+          <i data-lucide="bell" class="icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="page">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <a href="arenden.html" class="page-back">
+            <i data-lucide="arrow-left" class="icon"></i>
+            Tillbaka till ärenden
+          </a>
+          <div class="page-id" data-case-id="2024-0142">Ärende #2024-0142</div>
+          <h1 class="page-title" data-field="title">Vattenläcka under diskbänk</h1>
+          <div class="page-meta">
+            <span class="page-meta-item">
+              <i data-lucide="map-pin" class="icon"></i>
+              <span data-field="address">Storgatan 42</span>, <span data-field="apartment">Lgh 1204</span>
+            </span>
+            <span class="page-meta-item">
+              <i data-lucide="tag" class="icon"></i>
+              <span data-field="category">VVS</span>
+            </span>
+            <span class="page-meta-item">
+              <i data-lucide="clock" class="icon"></i>
+              <span data-field="created">2024-01-15, 08:32</span>
+            </span>
+          </div>
+        </div>
+        <div class="page-header-right">
+          <span class="status urgent" data-field="status">
+            <span class="status-dot"></span>
+            Brådskande
+          </span>
+          <button class="btn btn-secondary">
+            <i data-lucide="edit" class="icon"></i>
+            Redigera
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="content-grid">
+        <!-- Left Column - Main Content -->
+        <div class="main-column">
+
+          <!-- Case Description -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="file-text" class="icon"></i>
+                Ärendebeskrivning
+              </h2>
+            </div>
+            <div class="card-body">
+              <div class="description" data-field="description">
+                <p>Hyresgästen rapporterar att det läcker vatten under diskbänken i köket. Läckan upptäcktes igår kväll och har blivit värre under natten. Vattnet rinner ut på golvet och hyresgästen har lagt handdukar för att suga upp vattnet.</p>
+                <p>Hyresgästen misstänker att det är röret under vasken som läcker. Det droppar kontinuerligt även när vattnet är avstängt. Behöver akut åtgärd då det riskerar att skada golvet och sprida fukt.</p>
+                <p><strong>Tillträde:</strong> Hyresgästen arbetar hemifrån och är tillgänglig hela dagen.<br>
+                <strong>Portkod:</strong> 4521</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Internal Note -->
+          <div class="card green">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="edit-3" class="icon"></i>
+                Intern anteckning
+              </h2>
+              <span class="card-badge">Visas endast internt</span>
+            </div>
+            <div class="card-body">
+              <div class="form-section">
+                <textarea
+                  id="intern-anteckning"
+                  class="form-textarea"
+                  placeholder="Skriv din interna anteckning här..."
+                ></textarea>
+                <p class="form-hint">Anteckningen sparas i ärendehistoriken och är endast synlig för personal.</p>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="saveNote()">
+                  <i data-lucide="save" class="icon"></i>
+                  Spara anteckning
+                </button>
+                <button class="btn btn-ghost" onclick="clearField('intern-anteckning')">
+                  Rensa
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reply to Tenant -->
+          <div class="card blue">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="message-square" class="icon"></i>
+                Svar till hyresgäst
+              </h2>
+              <span class="card-badge">Skickas via e-post</span>
+            </div>
+            <div class="card-body">
+              <div class="form-section">
+                <textarea
+                  id="svar-hyresgast"
+                  class="form-textarea"
+                  placeholder="Skriv ditt meddelande till hyresgästen..."
+                ></textarea>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="sendReply()">
+                  <i data-lucide="send" class="icon"></i>
+                  Skicka meddelande
+                </button>
+                <button class="btn btn-ghost" onclick="clearField('svar-hyresgast')">
+                  Rensa
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Order -->
+          <div class="card orange">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="wrench" class="icon"></i>
+                Arbetsorder
+              </h2>
+              <span class="card-badge">Skickas till entreprenör</span>
+            </div>
+            <div class="card-body">
+              <div class="form-section">
+                <label class="form-label">Välj entreprenör</label>
+                <select id="entreprenor" class="form-select">
+                  <option value="">Välj entreprenör...</option>
+                  <option value="rorjouren" data-email="jour@rorjouren.se" data-phone="08-123 45 67">Rörjouren Stockholm AB</option>
+                  <option value="vvs-teknik" data-email="info@vvsteknik.se" data-phone="08-234 56 78">VVS-Teknik & Service</option>
+                  <option value="akut-ror" data-email="akut@rorvarme.se" data-phone="08-345 67 89">Akut Rör & Värme AB</option>
+                  <option value="eljouren" data-email="jour@eljouren247.se" data-phone="08-456 78 90">Eljouren 24/7</option>
+                  <option value="lasjouren" data-email="jour@lasjouren.se" data-phone="08-890 12 34">Låsjouren Stockholm</option>
+                </select>
+                <p class="form-hint" style="margin-top:8px;"><a href="entreprenorer.html" style="color:#4A7C94;">Hantera entreprenörer →</a></p>
+              </div>
+              <div class="form-section">
+                <label class="form-label">Arbetsbeskrivning</label>
+                <textarea
+                  id="arbetsorder"
+                  class="form-textarea"
+                  placeholder="Beskriv arbetet som ska utföras..."
+                ></textarea>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="sendWorkOrder()">
+                  <i data-lucide="send" class="icon"></i>
+                  Skicka arbetsorder
+                </button>
+                <button class="btn btn-ghost" onclick="clearField('arbetsorder')">
+                  Rensa
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Close Case -->
+          <div class="card purple">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="check-circle" class="icon"></i>
+                Slutnotering
+              </h2>
+              <span class="card-badge">Avslutar ärendet</span>
+            </div>
+            <div class="card-body">
+              <div class="form-section">
+                <textarea
+                  id="slutnotering"
+                  class="form-textarea"
+                  placeholder="Beskriv hur ärendet löstes och eventuella åtgärder som vidtagits..."
+                ></textarea>
+                <p class="form-hint">Slutnoteringen sparas och ärendet markeras som avslutat.</p>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-success" onclick="closeCase()">
+                  <i data-lucide="check" class="icon"></i>
+                  Avsluta ärende
+                </button>
+                <button class="btn btn-ghost" onclick="clearField('slutnotering')">
+                  Rensa
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div class="side-column">
+
+          <!-- Tenant Info -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="user" class="icon"></i>
+                Hyresgäst
+              </h2>
+            </div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Namn</span>
+                  <span class="info-value" data-field="tenant-name">Anna Bergström</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Telefon</span>
+                  <span class="info-value"><a href="tel:0701234567" data-field="tenant-phone">070-123 45 67</a></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">E-post</span>
+                  <span class="info-value"><a href="mailto:anna.bergstrom@email.se" data-field="tenant-email">anna.bergstrom@email.se</a></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Adress</span>
+                  <span class="info-value" data-field="tenant-address">Storgatan 42, Lgh 1204</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Portkod</span>
+                  <span class="info-value" data-field="door-code">4521</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Case Details -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="info" class="icon"></i>
+                Ärendedetaljer
+              </h2>
+            </div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Ärendenummer</span>
+                  <span class="info-value" data-field="case-number">#2024-0142</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Kategori</span>
+                  <span class="info-value" data-field="case-category">VVS</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Prioritet</span>
+                  <span class="info-value" data-field="case-priority" style="color: #dc2626;">Hög</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Tilldelad</span>
+                  <span class="info-value" data-field="assigned-to">Maria Lindqvist</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">SLA-tid kvar</span>
+                  <span class="info-value" data-field="sla-time" style="color: #dc2626;">4 timmar</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <i data-lucide="clock" class="icon"></i>
+                Historik
+              </h2>
+            </div>
+            <div class="card-body" style="padding: 12px 20px;">
+              <div class="timeline" id="timeline">
+                <div class="timeline-item active">
+                  <div class="timeline-dot">
+                    <i data-lucide="plus" class="icon"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <span class="timeline-title">Ärende skapat</span>
+                      <span class="timeline-time">08:32</span>
+                    </div>
+                    <p class="timeline-text">Felanmälan mottagen via Mina sidor</p>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot">
+                    <i data-lucide="alert-circle" class="icon"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <span class="timeline-title">Prioritet ändrad</span>
+                      <span class="timeline-time">08:33</span>
+                    </div>
+                    <p class="timeline-text">Automatiskt klassad som Brådskande</p>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot">
+                    <i data-lucide="mail" class="icon"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <span class="timeline-title">Bekräftelse skickad</span>
+                      <span class="timeline-time">08:33</span>
+                    </div>
+                    <p class="timeline-text">Automatiskt mail till hyresgäst</p>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot">
+                    <i data-lucide="user" class="icon"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <span class="timeline-title">Tilldelad</span>
+                      <span class="timeline-time">08:45</span>
+                    </div>
+                    <p class="timeline-text">Tilldelad Maria Lindqvist</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+  <div class="toast" id="toast">
+    <i data-lucide="check-circle" class="icon" id="toast-icon"></i>
+    <span id="toast-message">Åtgärd utförd</span>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  // Toast
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const toastIcon = document.getElementById('toast-icon');
+
+    toastMessage.textContent = message;
+    toast.className = 'toast ' + type;
+    toastIcon.setAttribute('data-lucide', type === 'error' ? 'alert-circle' : 'check-circle');
+    lucide.createIcons();
+
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // Clear field
+  function clearField(id) {
+    document.getElementById(id).value = '';
+  }
+
+  // Add to timeline
+  function addToTimeline(title, text, icon = 'check') {
+    const timeline = document.getElementById('timeline');
+    const now = new Date();
+    const time = now.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+
+    const item = document.createElement('div');
+    item.className = 'timeline-item active';
+    item.innerHTML = `
+      <div class="timeline-dot">
+        <i data-lucide="${icon}" class="icon"></i>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-header">
+          <span class="timeline-title">${title}</span>
+          <span class="timeline-time">${time}</span>
+        </div>
+        <p class="timeline-text">${text}</p>
+      </div>
+    `;
+
+    timeline.querySelectorAll('.timeline-item').forEach(i => i.classList.remove('active'));
+    timeline.insertBefore(item, timeline.firstChild);
+    lucide.createIcons();
+  }
+
+  // Save internal note
+  function saveNote() {
+    const note = document.getElementById('intern-anteckning').value;
+    if (!note.trim()) {
+      showToast('Skriv en anteckning först', 'error');
+      return;
+    }
+    addToTimeline('Intern anteckning', note.substring(0, 60) + (note.length > 60 ? '...' : ''), 'edit-3');
+    clearField('intern-anteckning');
+    showToast('Anteckning sparad');
+  }
+
+  // Send reply
+  function sendReply() {
+    const reply = document.getElementById('svar-hyresgast').value;
+    if (!reply.trim()) {
+      showToast('Skriv ett meddelande först', 'error');
+      return;
+    }
+    addToTimeline('Meddelande skickat', 'Svar skickat till Anna Bergström', 'send');
+    clearField('svar-hyresgast');
+    showToast('Meddelande skickat');
+  }
+
+  // Send work order
+  function sendWorkOrder() {
+    const entreprenor = document.getElementById('entreprenor').value;
+    const text = document.getElementById('arbetsorder').value;
+
+    if (!entreprenor) {
+      showToast('Välj en entreprenör', 'error');
+      return;
+    }
+    if (!text.trim()) {
+      showToast('Skriv en arbetsbeskrivning', 'error');
+      return;
+    }
+
+    const names = {
+      'rorjouren': 'Rörjouren Stockholm AB',
+      'vvs-teknik': 'VVS-Teknik & Service',
+      'akut-ror': 'Akut Rör & Värme AB'
+    };
+
+    addToTimeline('Arbetsorder skickad', 'Skickad till ' + names[entreprenor], 'wrench');
+    clearField('arbetsorder');
+    document.getElementById('entreprenor').value = '';
+    showToast('Arbetsorder skickad');
+  }
+
+  // Close case
+  function closeCase() {
+    const note = document.getElementById('slutnotering').value;
+    if (!note.trim()) {
+      showToast('Skriv en slutnotering först', 'error');
+      return;
+    }
+    addToTimeline('Ärende avslutat', note.substring(0, 60) + (note.length > 60 ? '...' : ''), 'check-circle');
+    clearField('slutnotering');
+    showToast('Ärendet har avslutats');
+
+    // Update status
+    const status = document.querySelector('.status');
+    if (status) {
+      status.className = 'status';
+      status.style.background = '#f0fdf4';
+      status.style.color = '#16a34a';
+      status.innerHTML = '<span class="status-dot" style="background:#16a34a;"></span>Avslutat';
+    }
+  }
+
+  // Log available fields for extension
+  console.log('Pigello Demo - Ärende #2024-0142');
+  console.log('Text fields for Rafter:');
+  console.log('  #intern-anteckning - Internal notes');
+  console.log('  #svar-hyresgast - Reply to tenant');
+  console.log('  #arbetsorder - Work order');
+  console.log('  #slutnotering - Closing note');
+  console.log('Data fields:', {
+    title: document.querySelector('[data-field="title"]')?.textContent,
+    address: document.querySelector('[data-field="address"]')?.textContent,
+    apartment: document.querySelector('[data-field="apartment"]')?.textContent,
+    tenant: document.querySelector('[data-field="tenant-name"]')?.textContent
+  });
+</script>
+</body>
+</html>

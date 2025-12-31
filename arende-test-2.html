@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ärende #2024-0202 | Pigello</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+    .sidebar-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon { width: 32px; height: 32px; background: #5a6a72; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 13px; }
+    .logo-text { font-size: 17px; font-weight: 600; color: #374151; }
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 12px; margin-bottom: 8px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 3px; color: #64748b; text-decoration: none; font-size: 13px; font-weight: 500; }
+    .nav-item.active { background: #e5e7eb; color: #374151; }
+    .sidebar-footer { padding: 16px; border-top: 1px solid #e2e8f0; }
+    .user-card { display: flex; align-items: center; gap: 12px; padding: 8px; }
+    .user-avatar { width: 34px; height: 34px; background: #6b7280; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px; }
+    .user-info { flex: 1; }
+    .user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .user-role { font-size: 12px; color: #94a3b8; }
+    .main { flex: 1; margin-left: 260px; min-height: 100vh; }
+    .topbar { height: 64px; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 32px; position: sticky; top: 0; z-index: 50; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .breadcrumb a { color: #64748b; text-decoration: none; }
+    .breadcrumb-sep { color: #cbd5e1; }
+    .breadcrumb-current { color: #1e293b; font-weight: 500; }
+    .page { padding: 32px; }
+    .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+    .page-header-left { flex: 1; }
+    .page-back { display: inline-flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; text-decoration: none; margin-bottom: 12px; }
+    .page-id { display: inline-block; font-size: 12px; font-weight: 500; color: #64748b; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .page-title { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .page-meta { display: flex; align-items: center; gap: 16px; font-size: 14px; color: #64748b; }
+    .page-meta-item { display: flex; align-items: center; gap: 6px; }
+    .status { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .status.urgent { background: #FEE2E2; color: #991B1B; }
+    .status.pending { background: #FEF3C7; color: #92400E; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 3px; font-size: 13px; font-weight: 500; border: 1px solid; cursor: pointer; }
+    .btn-primary { background: #475569; color: white; border-color: #475569; }
+    .btn-ghost { background: transparent; color: #64748b; border-color: transparent; }
+    .content-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+    .card { background: #ffffff; border-radius: 4px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+    .card-header { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; background: #f9fafb; }
+    .card-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #1e293b; text-transform: uppercase; }
+    .card-badge { font-size: 11px; font-weight: 500; color: #64748b; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+    .card-body { padding: 20px; }
+    .description { font-size: 14px; color: #475569; line-height: 1.7; }
+    .description p { margin-bottom: 12px; }
+    .description strong { color: #1e293b; font-weight: 600; }
+    .info-list { display: flex; flex-direction: column; gap: 16px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-label { font-size: 12px; font-weight: 500; color: #94a3b8; text-transform: uppercase; }
+    .info-value { font-size: 14px; color: #1e293b; font-weight: 500; }
+    .info-value a { color: #4A7C94; text-decoration: none; }
+    .form-section { margin-bottom: 24px; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 8px; }
+    .form-textarea { width: 100%; min-height: 120px; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; color: #1e293b; resize: vertical; }
+    .form-textarea:focus { outline: none; border-color: #6b7280; }
+    .form-select { width: 100%; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #ffffff; }
+    .form-actions { display: flex; gap: 12px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-header"><a href="index.html" class="logo"><div class="logo-icon">P</div><span class="logo-text">Pigello</span></a></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Förvaltning</div>
+        <a href="arenden.html" class="nav-item active"><i data-lucide="clipboard-list" class="icon"></i>Ärenden</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer"><div class="user-card"><div class="user-avatar">ML</div><div class="user-info"><div class="user-name">Maria Lindqvist</div><div class="user-role">Förvaltare</div></div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <nav class="breadcrumb">
+        <a href="index.html">Dashboard</a><span class="breadcrumb-sep">/</span>
+        <a href="arenden.html">Ärenden</a><span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">#2024-0202</span>
+      </nav>
+    </header>
+
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <a href="arenden.html" class="page-back"><i data-lucide="arrow-left" class="icon"></i>Tillbaka</a>
+          <div class="page-id" data-case-id="2024-0202">Ärende #2024-0202</div>
+          <h1 class="page-title" data-field="title">Mögel eller nåt i badrummet kanske?</h1>
+          <div class="page-meta">
+            <span class="page-meta-item"><i data-lucide="map-pin" class="icon"></i><span data-field="address">Drottninggatan 88</span>, <span data-field="apartment">Lgh 1501</span></span>
+            <span class="page-meta-item"><i data-lucide="tag" class="icon"></i><span data-field="category">Övrigt</span></span>
+            <span class="page-meta-item"><i data-lucide="clock" class="icon"></i><span data-field="created">2024-01-14, 19:22</span></span>
+          </div>
+        </div>
+        <div class="page-header-right">
+          <span class="status pending" data-field="status"><span class="status-dot"></span>Väntar</span>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="main-column">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i data-lucide="file-text" class="icon"></i>Ärendebeskrivning</h2>
+            </div>
+            <div class="card-body">
+              <div class="description" data-field="description">
+                <p>Hej! Jag vet inte riktigt om det här är nåt ni behöver fixa men det har dykt upp svarta prickar i taket i badrummet, typ vid duschen. Det kanske bara är smuts? Min kompis sa att det kan vara mögel men jag vet inte...</p>
+                <p>Det har nog varit där ett tag, kanske några månader? Jag tänkte inte på det först. Det luktar lite unket ibland men det kanske är normalt? Fläkten fungerar tror jag, den låter i alla fall.</p>
+                <p>Jag har försökt skrubba bort det med Ajax men det kommer tillbaka. Är det farligt? Min mamma sa att mögel kan göra en sjuk men jag mår bra tror jag, fast jag har hostat lite på sistone men det är väl förkylning?</p>
+                <p>Jag bifogar en bild men den blev lite suddig. Ni kanske kan komma och titta om ni har tid, men det är ingen stress om det inte är viktigt. Jag vill inte vara till besvär.</p>
+                <p><strong>Bilder:</strong> 1 st (bilaga, suddig)<br>
+                <strong>Tillträde:</strong> Jobbar dagtid men kan ta ledigt om det behövs, eller så kan ni låna nyckeln av vicevärden?</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="edit-3" class="icon"></i>Intern anteckning</h2><span class="card-badge">Visas endast internt</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="intern-anteckning" class="form-textarea" placeholder="Skriv din interna anteckning här..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary"><i data-lucide="save" class="icon"></i>Spara</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="message-square" class="icon"></i>Svar till hyresgäst</h2><span class="card-badge">Skickas via e-post</span></div>
+            <div class="card-body">
+              <div class="form-section"><textarea id="svar-hyresgast" class="form-textarea" placeholder="Skriv ditt meddelande till hyresgästen..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary"><i data-lucide="send" class="icon"></i>Skicka</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="wrench" class="icon"></i>Arbetsorder</h2><span class="card-badge">Skickas till entreprenör</span></div>
+            <div class="card-body">
+              <div class="form-section">
+                <label class="form-label">Välj entreprenör</label>
+                <select id="entreprenor" class="form-select">
+                  <option value="">Välj entreprenör...</option>
+                  <option value="fuktspecialisten">Fukt & Sanering AB</option>
+                  <option value="byggservice">Byggservice Stockholm</option>
+                </select>
+              </div>
+              <div class="form-section"><textarea id="arbetsorder" class="form-textarea" placeholder="Beskriv arbetet..."></textarea></div>
+              <div class="form-actions"><button class="btn btn-primary"><i data-lucide="send" class="icon"></i>Skicka</button><button class="btn btn-ghost">Rensa</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-column">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="user" class="icon"></i>Hyresgäst</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Namn</span><span class="info-value" data-field="tenant-name">Elin Norberg</span></div>
+                <div class="info-item"><span class="info-label">Telefon</span><span class="info-value"><a data-field="tenant-phone">076-234 56 78</a></span></div>
+                <div class="info-item"><span class="info-label">E-post</span><span class="info-value"><a data-field="tenant-email">elin.norberg@hotmail.com</a></span></div>
+                <div class="info-item"><span class="info-label">Adress</span><span class="info-value" data-field="tenant-address">Drottninggatan 88, Lgh 1501</span></div>
+                <div class="info-item"><span class="info-label">Portkod</span><span class="info-value" data-field="door-code">2847</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2 class="card-title"><i data-lucide="info" class="icon"></i>Ärendedetaljer</h2></div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item"><span class="info-label">Kategori</span><span class="info-value" data-field="case-category">Övrigt (behöver kategoriseras)</span></div>
+                <div class="info-item"><span class="info-label">Prioritet</span><span class="info-value" data-field="case-priority">Ej klassad</span></div>
+                <div class="info-item"><span class="info-label">Bilaga</span><span class="info-value">1 st suddig bild</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>
